@@ -1,4 +1,4 @@
-// Lab1 - EC4770 - John Sibert
+// Lab1 - EC4770
 // DES_Encryption_Module.cpp : This file contains the 'main' function. Program execution begins and ends there.
 // 
 // This simple DES encryption module is designed to only take binary strings from users (strings that contain only '1's and '0's)
@@ -102,7 +102,6 @@ public:
 
         // Begin Key initialization process
         DES_Key_Module keyModule(userKey);
-        cout << "This is the binary representation of the hexadecimal key you entered: " << endl << keyModule.getKey() << endl;
     }
 
     void padBits(vector<bool>& bits, size_t targetSize) {
@@ -143,7 +142,7 @@ public:
         initial_permutation = initialPermutation(message_bits);
 
         // Print the vector elements
-        cout << " Permuted Bit Vector: ";
+        cout << "(Initial) Permuted Message Bit Vector: " << endl;
         for (bool value : initial_permutation) {
             cout << value;
         }
@@ -184,6 +183,11 @@ int main()
     DES_Encryption_Module des(userInput, userKey);
 
     des.encryption();
+
+    system("pause");
+    // Wait for user input before closing the console window
+    cout << "Press Enter to exit.";
+    cin.get();
 
     return 0;
 }

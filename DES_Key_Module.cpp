@@ -37,8 +37,37 @@ DES_Key_Module::DES_Key_Module(const string& keyString) {
         cerr << "Error: The key size must be exactly 64 bits." << endl;
         // Optionally, you might throw an exception or handle the error in a different way.
     }
+    cout << "This is the binary representation of the hexadecimal key you entered: " << endl << getKey() << endl;
+
+    removeParityBits();
+
+    // DEBUG
+    cout << "Truncated key is: " << endl;
+    for (char value : key_parity_removed) {
+        cout << value;
+    }
+    cout << endl;
 }
 
+// Utility helper to obtain user Key
 string DES_Key_Module::getKey() const {
     return key;
+}
+
+// This function takes the user key and strips the parity bits
+void DES_Key_Module::removeParityBits() {
+    if (key.size() != 64) {
+        cerr << "Error: Key is not 64 bits in length, cannot truncate parity bits." << endl;
+    }
+
+    string truncatedKey;
+
+    // Loop the keystring every 8 bits and removed the parity bits
+    for (size_t i = 0; i < 64; i += 8) {
+        string block = key.substr(i, 8);
+        truncatedKey += block.substr(0, 7);  // Remove the parity bit
+    }
+
+    // Assign truncated key to the class property
+    key_parity_removed = truncatedKey;
 }
