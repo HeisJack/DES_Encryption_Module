@@ -5,15 +5,42 @@
 
 #include <string>
 #include <bitset>
+#include <vector>
 
 class DES_Key_Module {
 private:
     std::string key;
-    std::string key_parity_removed;
+    std::vector<bool> pc1_key;
+    std::vector<std::vector<std::vector<bool>>> subKeys;
+
+    const std::vector<int> PC2table = {
+    14, 17, 11, 24, 1, 5, 3, 28,
+    15, 6, 21, 10, 23, 19, 12, 4,
+    26, 8, 16, 7, 27, 20, 13, 2,
+    41, 52, 31, 37, 47, 55, 30, 40,
+    51, 45, 33, 48, 44, 49, 39, 56,
+    34, 53, 46, 42, 50, 36, 29, 32
+    };
+    const std::vector<int> PC1table = {
+    57, 49, 41, 33, 25, 17, 9,
+    1,  58, 50, 42, 34, 26, 18,
+    10, 2,  59, 51, 43, 35, 27,
+    19, 11, 3,  60, 52, 44, 36,
+    63, 55, 47, 39, 31, 23, 15,
+    7,  62, 54, 46, 38, 30, 22,
+    14, 6,  61, 53, 45, 37, 29,
+    21, 13, 5,  28, 20, 12, 4
+    };
+    const std::vector<int> shiftValues = {
+    1, 1, 2, 2, 2, 2, 2, 2,
+    1, 2, 2, 2, 2, 2, 2, 1
+    };
 
     std::bitset<64> hexToBinary(const std::string& hexString);
+    void permutation(const std::string keystring, const std::vector<int> table, std::vector<bool>& target);
+    void generateSubKeys(std::vector<bool>& input_key, const std::size_t iterations);
+    std::vector<bool> circLeftShift(const std::vector<bool>& input, std::size_t shiftAmount);
 
-    void removeParityBits();
 
 public:
     // Constructor that takes a string and initializes the "key" variable
@@ -21,6 +48,7 @@ public:
 
     // Public function to retrieve the key value
     std::string getKey() const;
+
 };
 
 #endif // DES_KEY_MODULE_H
