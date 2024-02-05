@@ -39,12 +39,14 @@ DES_Key_Module::DES_Key_Module(const string& keyString) {
     }
     cout << "This is the binary representation of the hexadecimal key you entered: " << endl << getKey() << endl;
 
+    vector<bool> converted_key = stringToBoolVector(key);
+
     // Perform the PC1 permutation on the key
-    permutation(key, PC1table, pc1_key);
+    permutation(converted_key, PC1table, pc1_key);
 
     generateSubKeys(pc1_key, 16);
 
-    cout << "Complete" << endl;
+    cout << "All subkeys generated" << endl;
 }
 
 // Utility helper to obtain user Key
@@ -52,8 +54,13 @@ string DES_Key_Module::getKey() const {
     return key;
 }
 
+vector<vector<bool>> DES_Key_Module::getPC2Keys() const {
+    return subKeys_final_pc2;
+}
 
-vector<bool> stringToBoolVector(const string& binaryString) {
+
+
+vector<bool> DES_Key_Module::stringToBoolVector(const string& binaryString) {
     vector<bool> boolVector;
 
     for (char c : binaryString) {
@@ -71,9 +78,7 @@ vector<bool> stringToBoolVector(const string& binaryString) {
     return boolVector;
 }
 
-void DES_Key_Module::permutation(const string keystring, const vector<int> table, vector<bool>& target) {
-    //vector<bool> permutedBlock(size);
-    vector<bool> converted_key = stringToBoolVector(keystring);
+void DES_Key_Module::permutation(vector<bool>& converted_key, const vector<int> table, vector<bool>& target) {
   
     // Get the size of the table to be used for permutation
     const size_t size = table.size();
@@ -83,19 +88,10 @@ void DES_Key_Module::permutation(const string keystring, const vector<int> table
     // Resize to our current working schematic
     target.resize(size);
 
-    cout << table.size() << endl;
-
     // Perform the initial permutation
     for (size_t i = 0; i < size; ++i) {
-        target[i] = converted_key[table[i]];
+        target[i] = converted_key[table[i] - 1]; // minus one to accomodate zero-indexing
     }
-
-    // DEBUG
-    cout << "PC1 permuted key: ";
-    for (bool value : target) {
-        cout << value;
-    }
-    cout << endl;
 
 }
 
@@ -134,6 +130,29 @@ void DES_Key_Module::generateSubKeys(vector<bool>& input_key, const size_t itera
 
         previous_shift_c = left_c;
         previous_shift_d = right_d;
+    }
+
+    // Concatenate the 28-bit vectors generated in the previous step into sixteen 56-bit
+    // vectors that will serve as the final subkeys
+    for (size_t i = 0; i < subKeys.size(); ++i) {
+        vector<bool> temp(56);
+        temp.clear();
+        for (size_t j = 0; j < subKeys[i].size(); ++j) {
+            temp.insert(temp.end(), subKeys[i][j].begin(), subKeys[i][j].end());
+            if (j == (subKeys[i].size() - 1)) {
+                subKeys_final.push_back(temp);
+            }
+        }
+    }
+
+    // Conduct PC2 permutation against each subkey generated in previous step and store
+    // in-place in subKeys_final
+    subKeys_final_pc2.clear();
+    vector<bool> temp(48);
+    for (size_t i = 0; i < subKeys_final.size(); ++i) {
+        temp.clear();
+        permutation(subKeys_final[i], PC2table, temp);
+        subKeys_final_pc2.push_back(temp);
     }
 }
 

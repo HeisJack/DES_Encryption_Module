@@ -12,6 +12,8 @@ private:
     std::string key;
     std::vector<bool> pc1_key;
     std::vector<std::vector<std::vector<bool>>> subKeys;
+    std::vector<std::vector<bool>> subKeys_final;
+    std::vector<std::vector<bool>>subKeys_final_pc2;
 
     const std::vector<int> PC2table = {
     14, 17, 11, 24, 1, 5, 3, 28,
@@ -37,7 +39,7 @@ private:
     };
 
     std::bitset<64> hexToBinary(const std::string& hexString);
-    void permutation(const std::string keystring, const std::vector<int> table, std::vector<bool>& target);
+    void permutation(std::vector<bool>& converted_key, const std::vector<int> table, std::vector<bool>& target);
     void generateSubKeys(std::vector<bool>& input_key, const std::size_t iterations);
     std::vector<bool> circLeftShift(const std::vector<bool>& input, std::size_t shiftAmount);
 
@@ -48,6 +50,10 @@ public:
 
     // Public function to retrieve the key value
     std::string getKey() const;
+
+    std::vector<bool> stringToBoolVector(const std::string& binaryString);
+
+    std::vector<std::vector<bool>> getPC2Keys() const;
 
 };
 
