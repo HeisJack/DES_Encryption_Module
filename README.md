@@ -11,3 +11,7 @@ Will currently ONLY take strings that are already in binary format as input mess
 Will currently ONLY take a 64-bit hexidecimal string as input for the key.
 
 
+Test Case:
+
+Key:  133457799BBCDFF1
+Message: 0000000100100011010001010110011110001001101010111100110111101111
